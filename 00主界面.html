@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相遇问题互动实验室 - 主控台</title>
+    <style>
+        /* 基础样式与子页面保持一致 */
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f1f5f9; 
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; 
+            color: #0f172a;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* 顶部导航头 */
+        .header {
+            width: 100%;
+            background: #1e293b;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 2px;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        /* 核心内容区 */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        /* 卡片网格布局 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        /* 独立卡片样式 */
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px 25px;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* 卡片悬停特效 */
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+            border-color: #3b82f6;
+        }
+        .card:hover .btn {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* 卡片内部元素 */
+        .icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+        .title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        /* 进入按钮 */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #eff6ff;
+            color: #3b82f6;
+            font-weight: bold;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        /* 底部装饰 */
+        .footer {
+            margin-top: auto;
+            padding: 20px;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* 序号角标 */
+        .badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #3b82f6;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 0 0 16px 0;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .card:nth-child(2) .badge { background: #f59e0b; }
+        .card:nth-child(3) .badge { background: #ec4899; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>🏃 数学互动实验室</h1>
+        <p>相遇与追及问题 · 动态可视化推演</p>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <a href="01路程计算与基础相遇.html" class="card">
+                <div class="badge">01</div>
+                <div class="icon">🚶</div>
+                <div class="title">基础相遇与路程计算</div>
+                <div class="desc">学习路程、速度与时间的基础关系。包含小明单人行走预测与两地相向而行的基础相遇模型。</div>
+                <div class="btn">进入实验</div>
+            </a>
+
+            <a href="02“路程和”的动态变化.html" class="card">
+                <div class="badge">02</div>
+                <div class="icon">🔄</div>
+                <div class="title">“路程和”动态与追及</div>
+                <div class="desc">进阶探索！演示两人未相遇、擦肩而过后的多次距离判定，以及错时出发的追及变形问题。</div>
+                <div class="btn">进入实验</div>
+            </a>
+
+            <a href="03折返跑问题.html" class="card">
+                <div class="badge">03</div>
+                <div class="icon">🐕</div>
+                <div class="title">经典“狗跑”折返模型</div>
+                <div class="desc">攻克奥数经典难题！将复杂的空间折返运动转化为统一的时间流逝，一键破解小狗跑动总路程。</div>
+                <div class="btn">进入实验</div>
+            </a>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 互动数学实验室 · 探索数理逻辑之美
+    </div>
+
+</body>
+</html>
