@@ -6,25 +6,26 @@
     input { width: 100px; padding: 6px; font-size: 16px; border: 2px solid #3b82f6; border-radius: 6px; text-align: center; }
     button { padding: 8px 16px; font-size: 16px; font-weight: bold; color: white; background-color: #3b82f6; border: none; border-radius: 6px; cursor: pointer; }
     .flag { font-size: 24px; }
-    .highlight { fill: #ef4444; font-weight: bold; }
+    .highlight-red { fill: #ef4444; font-weight: bold; }
+    .highlight-blue { fill: #3b82f6; font-weight: bold; }
   </style>
 
-  <text x="400" y="40" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">🐕 逻辑同步实验：谁先完成谁喊停</text>
-  <text x="400" y="70" font-size="14" fill="#64748b" text-anchor="middle">一旦狗跑完预测值 或 两人相遇，动画立即全部停止</text>
+  <text x="400" y="40" font-size="22" font-weight="bold" fill="#1e293b" text-anchor="middle">🐕 逻辑实验室：超量冲刺与提前冻结</text>
+  <text x="400" y="70" font-size="14" fill="#64748b" text-anchor="middle">少于1600: 全员提前冻结 | 多于1600: 狗冲出重围</text>
 
   <rect x="50" y="90" width="700" height="80" class="panel" stroke="#3b82f6" />
   <foreignObject x="180" y="110" width="440" height="50">
     <div xmlns="http://www.w3.org/1999/xhtml" style="display: flex; align-items: center; gap: 15px;">
-      <span style="font-weight: bold;">分配给狗：</span>
-      <input type="number" id="predictInput" value="800" />
+      <span style="font-weight: bold;">预测路程：</span>
+      <input type="number" id="predictInput" value="2000" />
       <span style="font-weight: bold;">米</span>
-      <button onclick="handleStart()">确认并开始</button>
+      <button onclick="handleStart()">开始测试</button>
     </div>
   </foreignObject>
 
   <rect x="50" y="190" width="700" height="200" fill="#f1f5f9" rx="12"/>
   <line x1="100" y1="310" x2="700" y2="310" class="track" />
-  <g id="finish-flag" transform="translate(460, 260)" opacity="0.3">
+  <g id="finish-flag" transform="translate(460, 260)" opacity="0.4">
     <text class="flag">🏁</text>
     <text y="65" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">正确相遇点</text>
   </g>
@@ -39,19 +40,19 @@
   </g>
 
   <rect x="50" y="410" width="700" height="150" class="panel" />
-  <text id="v-time" x="150" y="500" font-size="32" font-weight="bold" fill="#0f172a" text-anchor="middle">0.0 分</text>
-  <text x="150" y="460" font-size="14" fill="#64748b" text-anchor="middle">⏱️ 共同消耗时间</text>
-  <text id="v-dog" x="400" y="500" font-size="32" font-weight="bold" fill="#f59e0b" text-anchor="middle">0.0 米</text>
-  <text x="400" y="460" font-size="14" fill="#64748b" text-anchor="middle">🐕 狗跑的路程</text>
-  <text id="v-gap" x="650" y="500" font-size="32" font-weight="bold" fill="#ef4444" text-anchor="middle">2000</text>
-  <text x="650" y="460" font-size="14" fill="#64748b" text-anchor="middle">📏 两人剩余间距</text>
+  <text id="v-time" x="150" y="510" font-size="32" font-weight="bold" fill="#0f172a" text-anchor="middle">0.0</text>
+  <text x="150" y="460" font-size="14" fill="#64748b" text-anchor="middle">⏱️ 消耗时间(分)</text>
+  <text id="v-dog" x="400" y="510" font-size="32" font-weight="bold" fill="#f59e0b" text-anchor="middle">0.0</text>
+  <text x="400" y="460" font-size="14" fill="#64748b" text-anchor="middle">🐕 狗跑的路程(米)</text>
+  <text id="v-status" x="650" y="510" font-size="20" font-weight="bold" fill="#3b82f6" text-anchor="middle">准备就绪</text>
+  <text x="650" y="460" font-size="14" fill="#64748b" text-anchor="middle">📊 当前状态</text>
 
   <rect id="res-box" x="50" y="580" width="700" height="80" rx="12" fill="#f8fafc" stroke="#e2e8f0" />
-  <text id="res-text" x="400" y="625" font-size="18" font-weight="bold" text-anchor="middle" fill="#475569">输入预测值，看全员同步停止的情形</text>
+  <text id="res-text" x="400" y="625" font-size="18" font-weight="bold" text-anchor="middle" fill="#475569">等待测试结果...</text>
 
   <script><![CDATA[
     let animId = null;
-    let s = { time: 0, dDist: 0, pred: 0, dDir: 1, dX: 0, stop: false };
+    let s = { time: 0, dDist: 0, pred: 0, dDir: 1, dX: 0, finished: false };
     const SCALE = 600 / 2000;
 
     function handleStart() {
@@ -59,8 +60,8 @@
       if (isNaN(val) || val <= 0) return;
       if (animId) cancelAnimationFrame(animId);
 
-      s = { time: 0, dDist: 0, pred: val, dDir: 1, dX: 0, stop: false };
-      document.getElementById('res-text').textContent = "实验运行中...";
+      s = { time: 0, dDist: 0, pred: val, dDir: 1, dX: 0, finished: false };
+      document.getElementById('res-text').textContent = "正在同步模拟中...";
       document.getElementById('res-box').style.fill = "#f8fafc";
       
       tick();
@@ -69,37 +70,53 @@
     function tick() {
       const dt = 0.05;
       
-      // 核心停止逻辑：只要满足以下任一条件，全员立刻喊停
       const humansMet = s.time >= 20;
-      const dogFinished = s.dDist >= s.pred;
+      const dogDone = s.dDist >= s.pred;
 
-      if (humansMet || dogFinished) {
-        s.stop = true;
-        render(); // 渲染最后一帧
-        showFeedback(humansMet, dogFinished);
+      // 停止逻辑
+      // 1. 如果狗跑完了预测值，不管人有没有相遇，全部停下。
+      // 2. 如果人相遇了，但狗还没跑完，人停在原地，狗继续冲。
+      if (dogDone) {
+        render();
+        showFeedback(humansMet);
         return;
       }
 
-      // 如果没停，所有人都继续动
-      s.time += dt;
-      let step = 80 * dt;
-      if (s.dDist + step > s.pred) step = s.pred - s.dDist;
-      s.dDist += step;
+      // 更新时间 (如果人还没碰头，时间增加)
+      if (!humansMet) {
+        s.time += dt;
+      }
 
-      // 狗的坐标
-      s.dX += s.dDir * step;
-      let mX = 60 * s.time;
-      let hX = 2000 - (40 * s.time);
-      if (s.dDir === 1 && s.dX >= hX) { s.dX = hX; s.dDir = -1; }
-      else if (s.dDir === -1 && s.dX <= mX) { s.dX = mX; s.dDir = 1; }
+      // 更新狗的路程
+      let dogStep = 80 * dt;
+      if (s.dDist + dogStep > s.pred) dogStep = s.pred - s.dDist;
+      s.dDist += dogStep;
+
+      // 更新狗的坐标
+      if (!humansMet) {
+        // 相遇前的折返逻辑
+        s.dX += s.dDir * dogStep;
+        let mX = 60 * s.time;
+        let hX = 2000 - (40 * s.time);
+        if (s.dDir === 1 && s.dX >= hX) { s.dX = hX; s.dDir = -1; }
+        else if (s.dDir === -1 && s.dX <= mX) { s.dX = mX; s.dDir = 1; }
+        document.getElementById('v-status').textContent = "折返跑中";
+        document.getElementById('v-status').style.fill = "#3b82f6";
+      } else {
+        // 相遇后的冲刺逻辑
+        s.dX += s.dDir * dogStep;
+        document.getElementById('v-status').textContent = "超量冲刺";
+        document.getElementById('v-status').style.fill = "#ef4444";
+      }
 
       render();
       animId = requestAnimationFrame(tick);
     }
 
     function render() {
-      const mR = 60 * s.time;
-      const hR = 2000 - (40 * s.time);
+      // 限制人的坐标最大到1200和800
+      const mR = Math.min(60 * s.time, 1200);
+      const hR = 2000 - Math.min(40 * s.time, 800);
       
       document.getElementById('ming').setAttribute('cx', 100 + mR * SCALE);
       document.getElementById('ming-t').setAttribute('x', 100 + mR * SCALE);
@@ -108,24 +125,27 @@
       document.getElementById('dog').setAttribute('cx', 100 + s.dX * SCALE);
       document.getElementById('dog-t').setAttribute('x', 100 + s.dX * SCALE);
 
-      document.getElementById('v-time').textContent = s.time.toFixed(1) + " 分";
-      document.getElementById('v-dog').textContent = s.dDist.toFixed(1) + " 米";
-      document.getElementById('v-gap').textContent = Math.max(0, hR - mR).toFixed(0) + " 米";
+      document.getElementById('v-time').textContent = s.time.toFixed(1);
+      document.getElementById('v-dog').textContent = s.dDist.toFixed(1);
     }
 
-    function showFeedback(hM, dF) {
+    function showFeedback(hM) {
       const resT = document.getElementById('res-text');
       const resB = document.getElementById('res-box');
-      
-      if (dF && !hM) {
-        resT.textContent = "🛑 狗跑完了！但你看，主人们还没相遇，中间还差 " + document.getElementById('v-gap').textContent;
-        resB.style.fill = "#fef2f2";
-      } else if (hM && s.dDist < s.pred - 1) {
-        resT.textContent = "🛑 主人相遇了！但狗还没跑完你给的任务，它没能准时到达。";
-        resB.style.fill = "#fff7ed";
-      } else {
-        resT.textContent = "🎯 完美同步！狗跑完的一瞬间，主人也刚好握手！";
+      const diff = s.pred - 1600;
+
+      if (Math.abs(diff) < 1) {
+        resT.textContent = "🎯 完美结论！狗跑完预测值时，主人刚好相遇停下。";
         resB.style.fill = "#f0fdf4";
+        document.getElementById('v-status').textContent = "完美相遇";
+      } else if (diff < 0) {
+        resT.textContent = "❌ 预测过小：狗已停下，但主人中间还有缺口。";
+        resB.style.fill = "#fef2f2";
+        document.getElementById('v-status').textContent = "提前终止";
+      } else {
+        resT.textContent = "❌ 预测过大：主人在旗帜处相遇后，狗又多跑了 " + diff.toFixed(0) + " 米才停下。";
+        resB.style.fill = "#fff7ed";
+        document.getElementById('v-status').textContent = "冲过头了";
       }
     }
   ]]></script>
