@@ -1,14 +1,10 @@
-既然你的主界面采用了超酷的 **Minecraft (MC) 风格**，那配套的 `README` 文档也得写得像一份“游戏说明书”或者“任务手册”才行！
-
-你可以把这段代码保存为 `README.txt` 或者 `说明书.html`（如果放在 Gitee 上，直接保存为 `README.md`），发给对方时会显得非常专业且有趣。
-
----
-
 ## 📄 README：MC 数学大陆·任务手册
 
 ### 🎮 项目名称：相遇问题互动实验室 (Minecraft Edition)
 
 欢迎来到**方块数学大陆**！这里不是枯燥的考卷，而是一场关于红石逻辑、身法预测和史诗成就的思维挑战。
+
+[## 点击进入 ##](https://sh1rod.github.io/primary-school-math-animation/)
 
 ---
 
