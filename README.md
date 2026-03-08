@@ -1,7 +1,10 @@
 # 🌌 相遇问题实验室：维度传送手册
 
 欢迎来到**跨维度数学实验室**！这里不仅是一个学习平台，更是你思维的演练场。通过首页的“维度大门”，你可以在现代极简风格与像素方块世界之间自由穿梭。
-[## 点击进入 ##](https://sh1rod.github.io/primary-school-math-animation/)
+
+
+[## 点击此处进入 ##](https://sh1rod.github.io/primary-school-math-animation/)
+
 
 ---
 
