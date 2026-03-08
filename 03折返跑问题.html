@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>经典相遇问题模拟：狗跑模型实验室（双重解锁版）</title>
+    <style>
+        body { margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; background-color: #f1f5f9; font-family: 'PingFang SC', sans-serif; }
+        .teaching-text { max-width: 800px; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; line-height: 1.6; width: 100%; box-sizing: border-box; }
+        .teaching-text h4 { margin-top: 0; color: #0f172a; font-size: 1.2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;}
+        .question-block { margin-top: 20px; }
+        
+        .ans-container { display: none; margin-top: 10px; padding: 15px; background: #f0fdf4; border-left: 4px solid #22c55e; border-radius: 0 8px 8px 0; }
+        .ans-container ul { padding-left: 20px; color: #166534; margin: 0; }
+        .formula { font-style: italic; color: #15803d; font-size: 0.9em; }
+        .revealed { display: block; animation: slideDown 0.4s ease-out forwards; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .lock-status { font-size: 0.85em; color: #94a3b8; font-weight: normal; margin-left: 10px; }
+        .unlocked-status { color: #22c55e; font-weight: bold; }
+
+        .lab-container { width: 100%; max-width: 800px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; }
+        .lab-header { background: #1e293b; color: white; padding: 15px 20px; text-align: center; font-size: 1.2rem; font-weight: bold; }
+        
+        .control-panel { display: flex; justify-content: center; padding: 20px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; gap: 20px; flex-wrap: wrap; }
+        .task-card { flex: 1; min-width: 250px; max-width: 350px; background: white; padding: 15px 25px; border-radius: 8px; border: 1px solid #cbd5e1; text-align: center; position: relative; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .task-card h5 { margin: 0 0 10px 0; color: #0f172a; font-size: 1.1rem; }
+        .task-card p { font-size: 0.85rem; color: #64748b; margin-bottom: 15px; }
+        .input-group { display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 15px; }
+        .input-group input { width: 80px; padding: 6px; border: 2px solid #3b82f6; border-radius: 4px; text-align: center; font-weight: bold; font-size: 1rem; }
+        .task-card button { width: 100%; padding: 10px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        .task-card button:hover { background: #2563eb; }
+        .success-badge { position: absolute; top: -10px; right: -10px; background: #22c55e; color: white; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; line-height: 28px; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+
+        .svg-container { position: relative; width: 100%; height: 300px; background: #ffffff; }
+        
+        .anim-controls { text-align: center; padding: 10px; background: #f8fafc; border-top: 2px solid #e2e8f0; display: none; }
+        #pauseBtn { padding: 8px 24px; font-size: 16px; font-weight: bold; color: white; background: #f59e0b; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        #pauseBtn:hover { transform: scale(1.05); }
+
+        .dashboard { display: flex; justify-content: space-around; padding: 15px; background: #f1f5f9; border-top: 2px solid #e2e8f0; }
+        .dash-item { text-align: center; }
+        .dash-val { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
+        .dash-val.dog-val { color: #d97706; }
+        .dash-label { font-size: 0.85rem; color: #64748b; }
+        
+        .feedback { padding: 15px; text-align: center; font-size: 1.1rem; font-weight: bold; min-height: 30px; }
+        
+        .track { stroke: #cbd5e1; stroke-width: 4; stroke-dasharray: 6 6; }
+        .entity-label { font-size: 12px; font-weight: bold; fill: #fff; text-anchor: middle; pointer-events: none; }
+        .dog-label { font-size: 10px; font-weight: bold; fill: #fff; text-anchor: middle; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <div class="teaching-text">
+        <h4><strong>经典相遇问题与时间转换（“狗跑”模型）</strong></h4>
+        <p>在美丽的青青草原上，小明和小红分别站在路的两端 A 点和 B 点，相距 <strong>2000 米</strong>。小明的速度是 <strong>60 米/分钟</strong>，小红的速度是 <strong>40 米/分钟</strong>。他们同时出发，相向而行。</p>
+        <p>小明带了一只顽皮的金毛犬，它的速度很快，是 <strong>80 米/分钟</strong>。小明出发的一瞬间，小狗也跟着跑了出来。它只要一碰到小红，就立刻掉头往小明跑；一碰到小明，又立刻掉头往小红跑，直到两人相遇停下。</p>
+        
+        <div class="question-block">
+            <strong>① 小明、小红从出发到相遇需要多久？</strong>
+            <span id="lock-1" class="lock-status">🔒 预测成功后解锁解析</span>
+            <div id="ans-1" class="ans-container">
+                <ul>
+                    <li><strong>速度和</strong> ：60 + 40 = 100 米/分钟</li>
+                    <li><strong>时间</strong> ：2000 &divide; 100 = 20 分钟</li>
+                    <li class="formula">*(核心公式：路程和 &divide; 速度和 = 相遇时间)*</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <strong>② 当两人相遇的那一刻，这只小狗一共跑了多少米？</strong>
+            <span id="lock-2" class="lock-status">🔒 预测成功后解锁解析</span>
+            <div id="ans-2" class="ans-container">
+                <ul>
+                    <li>狗真正在跑的时间 = 两人相遇的时间 = <strong>20 分钟</strong></li>
+                    <li>狗的总路程：80 &times; 20 = <strong>1600 米</strong></li>
+                    <li class="formula">*(核心思维：将复杂的折返空间转化成了统一的运行时间)*</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="lab-container">
+        <div class="lab-header">🐕 狗跑折返模型实验室</div>
+        
+        <div class="control-panel">
+            <div class="task-card">
+                <div id="badge-1" class="success-badge">✓</div>
+                <h5>任务①：预测相遇时间</h5>
+                <p>无论狗怎么跑，主人相遇需要多久？</p>
+                <div class="input-group">
+                    <input type="number" id="input1" value="10"><span>分钟</span>
+                </div>
+                <button onclick="startTest(1)">运行验证</button>
+            </div>
+
+            <div class="task-card">
+                <div id="badge-2" class="success-badge">✓</div>
+                <h5>任务②：预测小狗总路程</h5>
+                <p>相遇时，这只狗来回一共跑了多远？</p>
+                <div class="input-group">
+                    <input type="number" id="input2" value="500"><span>米</span>
+                </div>
+                <button onclick="startTest(2)">运行验证</button>
+            </div>
+        </div>
+
+        <div class="svg-container">
+            <svg width="100%" height="100%" viewBox="0 0 800 300">
+                <line x1="100" y1="150" x2="700" y2="150" class="track" />
+                <text x="100" y="190" font-size="14" font-weight="bold" fill="#64748b" text-anchor="middle">A地 (0m)</text>
+                <text x="700" y="190" font-size="14" font-weight="bold" fill="#64748b" text-anchor="middle">B地 (2000m)</text>
+                
+                <g id="meet-flag" transform="translate(460, 100)" style="display: none;">
+                    <text font-size="24">🏁</text>
+                    <text y="-25" font-size="12" fill="#ef4444" text-anchor="middle" font-weight="bold">正确相遇点</text>
+                </g>
+
+                <circle id="ming" cx="100" cy="150" r="22" fill="#3b82f6" opacity="0.6" style="display: none;" />
+                <text id="ming-t" x="100" y="155" class="entity-label" style="display: none;">小明</text>
+
+                <circle id="hong" cx="700" cy="150" r="22" fill="#ec4899" opacity="0.6" style="display: none;" />
+                <text id="hong-t" x="700" y="155" class="entity-label" style="display: none;">小红</text>
+
+                <circle id="dog" cx="100" cy="120" r="14" fill="#f59e0b" stroke="#ffffff" stroke-width="2" style="display: none;" />
+                <text id="dog-t" x="100" y="124" class="dog-label" style="display: none;">狗</text>
+            </svg>
+        </div>
+
+        <div id="controls-area" class="anim-controls">
+            <button id="pauseBtn" onclick="togglePause()">⏸ 暂停动画</button>
+        </div>
+
+        <div class="dashboard">
+            <div class="dash-item">
+                <div class="dash-val" id="val-time">0.0</div>
+                <div class="dash-label">⏱️ 已用时间 (分钟)</div>
+            </div>
+            <div class="dash-item">
+                <div class="dash-val" id="val-ming">0</div>
+                <div class="dash-label">🏃 小明路程 (米)</div>
+            </div>
+            <div class="dash-item">
+                <div class="dash-val dog-val" id="val-dog">0</div>
+                <div class="dash-label">🐕 狗跑距离 (米)</div>
+            </div>
+            <div class="dash-item">
+                <div class="dash-val" id="val-hong">0</div>
+                <div class="dash-label">🏃 小红路程 (米)</div>
+            </div>
+        </div>
+
+        <div class="feedback" id="feedback-box" style="background: #f8fafc; color: #475569;">
+            请选择上方一个任务输入预测值，点击“运行验证”！
+        </div>
+    </div>
+
+    <script>
+        let animId = null;
+        let s = { mode: 0, time: 0, dogDist: 0, targetVal: 0, dogDir: 1, dogX: 0, active: false, paused: false };
+        const SVG_SCALE = 600 / 2000; 
+        const OFFSET_X = 100;
+        const TOTAL_DIST = 2000;
+
+        function toggleDisplay(id, isShow) { 
+            document.getElementById(id).style.display = isShow ? 'block' : 'none'; 
+        }
+        function setX(id, x_meter) { document.getElementById(id).setAttribute('cx', OFFSET_X + x_meter * SVG_SCALE); }
+        function setTextX(id, x_meter) { document.getElementById(id).setAttribute('x', OFFSET_X + x_meter * SVG_SCALE); }
+
+        function togglePause() {
+            if (!s.active) return;
+            s.paused = !s.paused;
+            const btn = document.getElementById('pauseBtn');
+            if (s.paused) {
+                btn.textContent = "▶ 继续动画";
+                btn.style.background = "#10b981";
+            } else {
+                btn.textContent = "⏸ 暂停动画";
+                btn.style.background = "#f59e0b";
+                tick(); 
+            }
+        }
+
+        function resetScene() {
+            toggleDisplay('ming', false); toggleDisplay('ming-t', false);
+            toggleDisplay('hong', false); toggleDisplay('hong-t', false);
+            toggleDisplay('dog', false); toggleDisplay('dog-t', false);
+            toggleDisplay('meet-flag', false);
+            
+            setX('ming', 0); setTextX('ming-t', 0);
+            setX('hong', TOTAL_DIST); setTextX('hong-t', TOTAL_DIST);
+            setX('dog', 0); setTextX('dog-t', 0);
+            
+            document.getElementById('val-time').textContent = '0.0';
+            document.getElementById('val-ming').textContent = '0';
+            document.getElementById('val-hong').textContent = '0';
+            document.getElementById('val-dog').textContent = '0';
+            document.getElementById('feedback-box').textContent = "正在同步模拟中...";
+            
+            document.getElementById('controls-area').style.display = 'none';
+        }
+
+        function startTest(mode) {
+            if (animId) cancelAnimationFrame(animId);
+            resetScene();
+            
+            s.mode = mode;
+            s.targetVal = parseFloat(document.getElementById('input' + mode).value);
+            
+            if (isNaN(s.targetVal) || s.targetVal <= 0) {
+                document.getElementById('feedback-box').textContent = "请输入有效的正数！";
+                return;
+            }
+
+            s.time = 0;
+            s.dogDist = 0;
+            s.dogX = 0;
+            s.dogDir = 1; 
+            s.active = true;
+            s.paused = false;
+
+            const box = document.getElementById('feedback-box');
+            box.style.background = "#f8fafc";
+            box.style.color = "#475569";
+            box.textContent = "动画演示中...";
+
+            document.getElementById('controls-area').style.display = 'block';
+            const btn = document.getElementById('pauseBtn');
+            btn.textContent = "⏸ 暂停动画";
+            btn.style.background = "#f59e0b";
+
+            toggleDisplay('ming', true); toggleDisplay('ming-t', true);
+            toggleDisplay('hong', true); toggleDisplay('hong-t', true);
+            toggleDisplay('dog', true); toggleDisplay('dog-t', true);
+
+            tick();
+        }
+
+        function tick() {
+            if (!s.active || s.paused) return;
+            
+            // 降低步长，方便观察
+            const dt = 0.05; 
+            
+            // 检查停止条件：模式1按时间停止，模式2按狗的距离停止
+            let timeDone = (s.mode === 1 && s.time >= s.targetVal);
+            let dogDone = (s.mode === 2 && s.dogDist >= s.targetVal);
+
+            if (timeDone || dogDone) {
+                s.active = false;
+                document.getElementById('controls-area').style.display = 'none';
+                renderPositions();
+                showFeedback();
+                return;
+            }
+
+            // 计算时间步长（防止最后一步超出预测目标）
+            let stepTime = dt;
+            if (s.mode === 1 && s.time + dt > s.targetVal) {
+                stepTime = s.targetVal - s.time;
+            }
+
+            let dogStep = 80 * stepTime;
+            if (s.mode === 2 && s.dogDist + dogStep > s.targetVal) {
+                dogStep = s.targetVal - s.dogDist;
+                stepTime = dogStep / 80; // 模式2下，如果狗到站了，时间也只能流逝相应的比例
+            }
+
+            s.time += stepTime;
+            s.dogDist += dogStep;
+
+            let humansMet = s.time >= 20;
+
+            if (s.time <= 20) {
+                s.dogX += s.dogDir * dogStep;
+                let mX = 60 * s.time;
+                let hX = 2000 - 40 * s.time;
+                
+                // 折返逻辑
+                if (s.dogDir === 1 && s.dogX >= hX) { 
+                    s.dogX = hX; 
+                    s.dogDir = -1; 
+                } else if (s.dogDir === -1 && s.dogX <= mX) { 
+                    s.dogX = mX; 
+                    s.dogDir = 1; 
+                }
+            } else {
+                // 如果主人已经相遇，但任务还没结束(比如狗距离还没跑够/预测时间过大)，狗冲出重围
+                s.dogX += s.dogDir * dogStep;
+            }
+
+            renderPositions();
+            animId = requestAnimationFrame(tick);
+        }
+
+        function renderPositions() {
+            // 主人相遇后会停在原地 (最多走到 1200 和 800)
+            let mDist = Math.min(60 * s.time, 1200); 
+            let hDist = Math.min(40 * s.time, 800);
+            
+            let mX = mDist;
+            let hX = 2000 - hDist;
+
+            setX('ming', mX); setTextX('ming-t', mX);
+            setX('hong', hX); setTextX('hong-t', hX);
+            setX('dog', s.dogX); setTextX('dog-t', s.dogX);
+
+            document.getElementById('val-time').textContent = s.time.toFixed(1);
+            document.getElementById('val-ming').textContent = Math.round(mDist);
+            document.getElementById('val-hong').textContent = Math.round(hDist);
+            document.getElementById('val-dog').textContent = Math.round(s.dogDist);
+        }
+
+        function showFeedback() {
+            const box = document.getElementById('feedback-box');
+            let isSuccess = false;
+
+            // 只要动画跑过了真实相遇时间，就展示相遇红旗
+            if (s.time >= 20) {
+                toggleDisplay('meet-flag', true);
+            }
+
+            if (s.mode === 1) {
+                const diff = s.targetVal - 20;
+                if (Math.abs(diff) < 0.1) {
+                    box.textContent = "🎯 完美结论！20分钟时两位主人刚好精确碰头。上方【解析①】已解锁！"; 
+                    box.style.background = "#dcfce3"; box.style.color = "#166534";
+                    isSuccess = true;
+                } else if (diff < 0) {
+                    box.textContent = `❌ 时间太短了：才跑了 ${s.targetVal} 分钟，主人中间还有缺口呢。`; 
+                    box.style.background = "#fee2e2"; box.style.color = "#991b1b";
+                } else {
+                    box.textContent = `❌ 时间给太多了：两人相遇后，又多消耗了 ${diff.toFixed(1)} 分钟。`; 
+                    box.style.background = "#fef3c7"; box.style.color = "#92400e";
+                }
+            } else if (s.mode === 2) {
+                const diff = s.targetVal - 1600;
+                if (Math.abs(diff) < 1) {
+                    box.textContent = "🎯 完美结论！小狗跑完 1600 米时，两位主人刚好精确碰头。上方【解析②】已解锁！"; 
+                    box.style.background = "#dcfce3"; box.style.color = "#166534";
+                    isSuccess = true;
+                } else if (diff < 0) {
+                    box.textContent = `❌ 预测过小：狗已经跑完停下了，但主人中间还有缺口没遇上呢。`; 
+                    box.style.background = "#fee2e2"; box.style.color = "#991b1b";
+                } else {
+                    box.textContent = `❌ 预测过大：主人在旗帜处相遇后，狗又冲出重围多跑了 ${Math.round(diff)} 米才停下。`; 
+                    box.style.background = "#fef3c7"; box.style.color = "#92400e";
+                }
+            }
+
+            if (isSuccess) {
+                const ansBox = document.getElementById('ans-' + s.mode);
+                if (ansBox && !ansBox.classList.contains('revealed')) ansBox.classList.add('revealed');
+                
+                const lockText = document.getElementById('lock-' + s.mode);
+                if (lockText) {
+                    lockText.textContent = "✅ 已解锁";
+                    lockText.className = "lock-status unlocked-status";
+                }
+
+                const badge = document.getElementById('badge-' + s.mode);
+                if (badge) badge.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

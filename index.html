@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>相遇问题实验室 - 维度选择</title>
+    <style>
+        :root {
+            --speed: 0.6s;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            background: #000;
+        }
+
+        /* 共有样式 */
+        .split {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: flex var(--speed) cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .split:hover {
+            flex: 1.5; /* 悬停侧扩张 */
+        }
+
+        .content {
+            z-index: 2;
+            text-align: center;
+            transition: transform var(--speed);
+            pointer-events: none;
+        }
+
+        .split:hover .content {
+            transform: scale(1.1);
+        }
+
+        h2 {
+            font-size: 3rem;
+            margin: 0;
+            color: white;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            border: 2px solid white;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(5px);
+        }
+
+        /* 背景装饰层 */
+        .bg-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: transform var(--speed), filter var(--speed);
+            filter: brightness(0.7);
+        }
+
+        .split:hover .bg-img {
+            transform: scale(1.1);
+            filter: brightness(0.9);
+        }
+
+        /* --- 左侧：普通大厅风格 --- */
+        .left {
+            background: #1e293b;
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
+
+        .left .bg-img {
+            /* 使用渐变色模拟简洁科技感，也可替换为一张现代建筑图片 */
+            background-image: linear-gradient(135deg, #3b82f6 0%, #1e293b 100%);
+        }
+
+        .left h2 {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* --- 右侧：MC 大厅风格 --- */
+        .right {
+            background: #274e13;
+        }
+
+        .right .bg-img {
+            /* 模仿草方块纹理的渐变 */
+            background-color: #38761d;
+            background-image: 
+                linear-gradient(45deg, #274e13 25%, transparent 25%), 
+                linear-gradient(-45deg, #274e13 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #274e13 75%), 
+                linear-gradient(-45deg, transparent 75%, #274e13 75%);
+            background-size: 40px 40px;
+        }
+
+        .right h2 {
+            color: #55ff55;
+            text-shadow: 3px 3px 0 #000, 3px 3px 10px rgba(0,255,0,0.5);
+        }
+
+        .right .btn {
+            border-color: #55ff55;
+            color: #55ff55;
+            background: rgba(0,0,0,0.3);
+        }
+
+        /* 分割线光效 */
+        .divider {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: white;
+            z-index: 3;
+            box-shadow: 0 0 20px rgba(255,255,255,0.8);
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="00主界面.html" class="split left">
+            <div class="bg-img"></div>
+            <div class="content">
+                <h2>标准维度</h2>
+                <div class="btn">进入实验室</div>
+            </div>
+        </a>
+
+        <a href="00主界面-mc.html" class="split right">
+            <div class="bg-img"></div>
+            <div class="content">
+                <h2>像素方块</h2>
+                <div class="btn">传送至大陆</div>
+            </div>
+        </a>
+
+        <div class="divider"></div>
+    </div>
+
+</body>
+</html>
