@@ -1,5 +1,5 @@
 ## 🏗️ 逻辑实验室挑战题：消失的“时间”
-[开始互动!](https://sh1rod.github.io/catch-up/)
+[开始互动！](https://sh1rod.github.io/catch-up/)
 
 ### 【题目背景】
 
